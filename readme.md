@@ -1,8 +1,8 @@
 Motivations
 ===
-After reading about the [new performance improvements](https://docs.tigera.io/calico/latest/release-notes/#other-changes) of Calico, I wanted to verify the claims and create a reproducible way for everyone to test out these changes on their own. The purpose of this repo is to create a reasonable cluster with nodes powerful enough to run 500 pods and after reaching the initial target pushing it until it breaks. *Well this is my plan, I would love to hear about your experiments. So please share them via the @fr0zenprocess twitter handel!*
+After reading about the [new performance improvements](https://docs.tigera.io/calico/3.25/release-notes/#other-changes) of Calico, I wanted to verify the claims and create a reproducible way for everyone to test out these changes on their own. The purpose of this repo is to create a reasonable cluster with nodes powerful enough to run 500 pods and after reaching the initial target pushing it until it breaks. *Well this is my plan, I would love to hear about your experiments. You can share them with me via the [@fr0zenprocess](https://twitter.com/fr0zenprocess) twitter handel!*
  
-I only had three rules for this setup:
+Three rules for this experiment to avoid breaking the world:
 1. The instance type for my experiment should not exceed the limits of my own pocket, which means something that doesn’t cost a lot of money.
 1. Container networking interface parameters/configurations should not be tweaked outside their quick setup tutorials.   
 1. Setup should be easy enough for anyone with any level of knowledge about Kubernetes and cloud to relate to. 
@@ -11,15 +11,21 @@ Requirements
 ===
 
 An AWS account
-Terraform
+
+[Terraform](https://developer.hashicorp.com/terraform/downloads?product_intent=terraform)
+
 kubectl *
-helm *
+
+[helm](https://helm.sh/docs/intro/install/) *
+
+Items with the `*` sign are for management.
 
 Steps
 ===
+
 Use the following command to pull the `demo-cluster` project:
 ```
-git submodule add https://github.com/frozenprocess/demo-cluster
+git clone https://github.com/frozenprocess/demo-cluster
 ```
 
 Browse into k3s folder:
@@ -29,7 +35,7 @@ cd demo-cluster/calico-k3s-aws
 
 # Terraform settings
 
-> **Note:** feel free to adjust the instance type to match your budget. 
+> **Note:** feel free to adjust the instance type to match your budget, but keep in mind that the charts represented here are created with these configurations.
 
 Use the following command to create the deployment config:
 ```
@@ -73,6 +79,8 @@ Do you want to perform these actions?
 ```
 
 After a successful deployment you will see the following message informing you about the public IP address of each instance. You can use the `calico-demo.pem` which is generated in the previous step.
+
+If you wish to delete these tutorial resources from your AWS account follow the last section.
 ```
 Outputs:
 
@@ -124,9 +132,11 @@ EOF
 
 # Prometheus and Grafana
 
+**Note:** Make sure that you have installed helm.
+
 Use the following command to install Prometheus and Grafana:
 ```
-helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack  --create-namespace  --namespace calico-monitoring -f https://github.com/frozenprocess/calico-vertical-scaling-experiment/main/prometheus-custom.yaml
+helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack  --create-namespace  --namespace calico-monitoring -f https://raw.githubusercontent.com/frozenprocess/calico-vertical-scaling-experiment/main/prometheus-custom.yaml
 ```
 
 ## Calico Prometheus integrations
@@ -174,7 +184,7 @@ EOF
 
 # Workload 
 
-> **Note:** The source code for this deployment can be found [here](https://github.com/frozenprocess/calico-vertical-scaling-experiment/main/wait-pod/).
+> **Note:** The source code for this deployment can be found [here](https://github.com/frozenprocess/calico-vertical-scaling-experiment/tree/main/wait-pod).
 
 Use the following command to create the workload deployment:
 ```
@@ -210,6 +220,8 @@ spec:
         name: wait-pod
 EOF
 ```
+
+> **Note:** Click [here](https://docs.tigera.io/calico/latest/operations/monitor/) to learn more about Calico monitoring.
 
 # Scaling Kubernetes style
 
