@@ -1,0 +1,15 @@
+FROM golang:bullseye AS base
+
+WORKDIR /app
+COPY main.go /app/
+
+RUN go mod init waitpod
+RUN go mod tidy
+
+RUN CGO_ENABLED=0 go build -o main main.go 
+
+FROM scratch
+
+COPY --from=base /app/main /app/main
+
+CMD ["/app/main"]
