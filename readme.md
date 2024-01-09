@@ -134,9 +134,27 @@ EOF
 
 **Note:** Make sure that you have installed helm.
 
+Add the prometheus-community repo to your helm charts:
+```
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm update
+```
+
 Use the following command to install Prometheus and Grafana:
 ```
 helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack  --create-namespace  --namespace calico-monitoring -f https://raw.githubusercontent.com/frozenprocess/calico-vertical-scaling-experiment/main/prometheus-custom.yaml
+```
+
+Use the following command to open the Grafana dashbaord on your local computer:
+```
+kubectl port-forward -n calico-monitoring   svc/kube-prometheus-stack-grafana 8080:80
+```
+
+> **Note:** The default Grafana username is admin.
+
+Use the following command to get the password:
+```
+kubectl get secret --namespace calico-monitoring kube-prometheus-stack-grafana -o jsonpath='{.data.admin-password}' | base64 -d
 ```
 
 ## Calico Prometheus integrations
